@@ -1,6 +1,6 @@
 from django.db import models
 from users.models import CustomUser
-from tailoring_ms.utils import EnumWithChoices
+from tailoring_ms.utils import EnumWithChoices, generate_document_filepath
 from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
@@ -97,6 +97,21 @@ class Order(models.Model):
         help_text=_("The quantity of items in the order."),
         default=1,
     )
+    reference_image = models.ImageField(
+        verbose_name=_("Reference"),
+        help_text=_("Reference image for design/inspiration"),
+        upload_to=generate_document_filepath,
+        default="default/27002.jpg",
+        null=False,
+        blank=True,
+    )
+    colors = models.CharField(
+        verbose_name=_("Colors"),
+        max_length=200,
+        help_text=_("Desired material color"),
+        null=True,
+        blank=True,
+    )
     urgency = models.CharField(
         max_length=6,
         choices=OrderUrgency.choices(),
@@ -129,6 +144,7 @@ class Order(models.Model):
         default="default/27002.jpg",
         null=False,
         blank=True,
+        upload_to=generate_document_filepath,
     )
     show_in_index = models.BooleanField(
         verbose_name=_("Show in index"),
@@ -136,7 +152,7 @@ class Order(models.Model):
         help_text=_("Display this order in 'Latest work' section of the website"),
     )
     created_at = models.DateTimeField(
-        auto_now=True, help_text=_("Date and time when the oder was created")
+        auto_now=True, help_text=_("Date and time when the oder was placed")
     )
 
     class Meta:
