@@ -186,7 +186,7 @@ JAZZMIN_SETTINGS = {
             "new_window": True,
         },
         {"model": "tailoring.Order"},
-        {"app": "Order"},
+        {"app": "tailoring"},
     ],
     "search_model": ["tailoring.Order"],
     "language_chooser": True,

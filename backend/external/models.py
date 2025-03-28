@@ -20,7 +20,7 @@ class About(models.Model):
     )
     details = models.TextField(
         help_text=_("Brand details"),
-        default="Welcome to Tailoing MS. We are committed to providing the best tailoring services.",
+        default="Welcome to Tailoring MS. We are committed to providing the best tailoring services.",
         null=False,
         blank=False,
     )
@@ -133,7 +133,7 @@ class ServiceFeedback(models.Model):
     rate = models.CharField(
         max_length=15, choices=FeedbackRate.choices(), help_text=_("Feedback rating")
     )
-    role = models.CharField(
+    sender_role = models.CharField(
         max_length=40,
         help_text=_("Sender's role/category"),
         choices=SenderRole.choices(),

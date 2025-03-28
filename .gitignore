@@ -178,9 +178,8 @@ vendor
 user_profile
 document
 migrations
-gallery
 /backend/files/static/
 node_modules
 .bolt
-medicine
+order
 plan.md

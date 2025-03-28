@@ -7,6 +7,7 @@ from django.core.validators import FileExtensionValidator
 from enum import Enum
 from datetime import datetime
 from django.core.validators import RegexValidator
+from datetime import date
 
 # Create your models here.
 
@@ -28,6 +29,11 @@ class CustomUser(AbstractUser):
         def choices(cls) -> list[tuple]:
             return [(key.value, key.name) for key in cls]
 
+    date_of_birth = models.DateField(
+        verbose_name=_("Date of birth"),
+        default=date(year=200, month=1, day=1),
+        help_text=_("Date user was born"),
+    )
     gender = models.CharField(
         verbose_name=_("gender"),
         max_length=10,

@@ -15,6 +15,7 @@ class CustomUserCreationForm(forms.ModelForm):
             "phone_number",
             "email",
             "location",
+            "date_of_birth",
             "password",
             # "profile",
         ]
@@ -38,5 +39,6 @@ class CustomUserUpdateForm(forms.ModelForm):
             "phone_number",
             "email",
             "location",
+            "date_of_birth",
             "password",
         ]
