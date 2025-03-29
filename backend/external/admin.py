@@ -47,14 +47,14 @@ class AboutAdmin(admin.ModelAdmin):
 
 @admin.register(ServiceFeedback)
 class ServiceFeedbackAdmin(admin.ModelAdmin):
-    list_display = ("sender", "rate", "show_in_index", "updated_at", "created_at")
+    list_display = ("sender", "rate", "show_in_index", "sender_role", "created_at")
     search_fields = ("sender__username", "message")
     list_filter = ("rate", "show_in_index", "updated_at", "created_at")
     list_editable = ("show_in_index",)
     ordering = ("-created_at",)
     fieldsets = (
         (None, {"fields": ("sender", "message")}),
-        (_("Details"), {"fields": ("role", "rate")}),
+        (_("Details"), {"fields": ("sender_role", "rate")}),
         (_("Timestamps"), {"fields": ("updated_at", "created_at")}),
     )
     readonly_fields = ("updated_at", "created_at")

@@ -16,6 +16,7 @@ class CustomUserCreationForm(forms.ModelForm):
             "email",
             "location",
             "date_of_birth",
+            "gender",
             "password",
             # "profile",
         ]

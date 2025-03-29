@@ -65,8 +65,11 @@ class OrderAdmin(admin.ModelAdmin):
         (_("Preferences"), {"fields": ("reference_image", "colors")}),
         (_("Cost Information"), {"fields": ("charges", "charges_paid")}),
         (_("Status and Picture"), {"fields": ("status", "picture")}),
-        (_("Publicity & Date"), {"fields": ("show_in_index", "created_at")}),
+        (
+            _("Publicity & Date"),
+            {"fields": ("show_in_index", "created_at", "updated_at")},
+        ),
     )
 
     ordering = ("-created_at",)
-    readonly_fields = ("created_at",)
+    readonly_fields = ("created_at", "updated_at")

@@ -11,6 +11,8 @@ class Service(models.Model):
         CUSTOM_SUITS = "Custom Suits"
         WEDDING_ATTIRE = "Wedding Attire"
         ALTERATIONS = "Alterations"
+        EMBROIDERY = "Embroidery"
+        UNIFORMS = "Uniforms"
         OTHER = "Other"
 
     name = models.CharField(
@@ -18,6 +20,7 @@ class Service(models.Model):
         max_length=100,
         help_text=_("Service name"),
         choices=ServiceName.choices(),
+        unique=True,
     )
     description = models.TextField(
         verbose_name=_("Description"), help_text=_("What about this service?")
@@ -64,6 +67,8 @@ class Order(models.Model):
         SILK = "Silk"
         WOOL = "Wool"
         POLYESTER = "Polyester"
+        LINEN = "Linen"
+        OTHER = "Other"
 
     class OrderStatus(EnumWithChoices):
         PENDING = "Pending"
@@ -101,8 +106,7 @@ class Order(models.Model):
         verbose_name=_("Reference"),
         help_text=_("Reference image for design/inspiration"),
         upload_to=generate_document_filepath,
-        default="default/27002.jpg",
-        null=False,
+        null=True,
         blank=True,
     )
     colors = models.CharField(
@@ -151,9 +155,32 @@ class Order(models.Model):
         default=True,
         help_text=_("Display this order in 'Latest work' section of the website"),
     )
+    updated_at = models.DateTimeField(
+        auto_now_add=True, help_text=_("Date and time when the order was updated")
+    )
     created_at = models.DateTimeField(
         auto_now=True, help_text=_("Date and time when the oder was placed")
     )
+
+    def model_dump(self) -> dict:
+        return dict(
+            id=self.id,
+            service_name=self.service.name,
+            quantity=self.quantity,
+            charges=self.charges,
+            status=self.status,
+            picture=self.picture.name,
+            details=self.details,
+            material_type=self.material_type,
+            fabric_required=self.fabric_required,
+            reference_image=(
+                self.reference_image.name if self.reference_image is not None else None
+            ),
+            created_at=self.created_at,
+            urgency=self.urgency,
+            charges_paid=self.charges_paid,
+            updated_at=self.updated_at,
+        )
 
     class Meta:
         verbose_name = _("Order")
@@ -161,3 +188,8 @@ class Order(models.Model):
 
     def __str__(self):
         return f"{self.service.name} by {self.client} on {self.created_at.strftime("%d-%b-%Y")}"
+
+    def delete(self, *args, **kwargs):
+        if self.reference_image is not None:
+            self.reference_image.delete(save=False)
+        super().delete(*args, **kwargs)

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, field_validator, Field, EmailStr, PastDatetime
-from typing import Optional, Any
+from typing import Optional, Any, Union
 from datetime import datetime, date
 from tailoring_ms.settings import MEDIA_URL
 from users.models import CustomUser
@@ -22,6 +22,106 @@ class TokenAuth(BaseModel):
             "example": {
                 "access_token": "tms_27b9d79erc245r44b9rba2crd2273b5cbb71",
                 "token_type": "bearer",
+            }
+        }
+
+
+class EditablePersonalData(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    phone_number: Optional[str] = None
+    email: Optional[str] = None
+    location: Optional[str] = None
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "first_name": "John",
+                "last_name": "Doe",
+                "phone_number": "+1234567890",
+                "email": "john.doe@example.com",
+                "location": "123 Main St, Anytown, USA",
+            }
+        }
+
+
+class Profile(EditablePersonalData):
+    username: str
+    date_of_birth: date
+    gender: CustomUser.UserGender
+    profile: Optional[str] = None
+    is_staff: Optional[bool] = False
+    date_joined: datetime
+
+    @field_validator("profile")
+    def validate_file(value):
+        if value:
+            return path.join(MEDIA_URL, value)
+        return value
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "first_name": "John",
+                "last_name": "Doe",
+                "phone_number": "+1234567890",
+                "email": "john.doe@example.com",
+                "location": "123 Main St, Anytown, USA",
+                "username": "johndoe",
+                "date_of_birth": "1990-01-01",
+                "gender": "male",
+                "profile": "/media/custom_user/profile.jpg",
+                "is_staff": False,
+                "date_joined": "2023-01-01T00:00:00",
+            }
+        }
+
+
+class EditableUserMeasurements(BaseModel):
+    chest: float
+    waist: float
+    hips: Optional[float] = 0
+    inseam: float
+    neck: float
+    sleeve_length: float
+    shoulder_width: float
+    thigh: float
+    calf: float
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "chest": 38.0,
+                "waist": 32.0,
+                "hips": 40.0,
+                "inseam": 30.0,
+                "neck": 15.5,
+                "sleeve_length": 34.0,
+                "shoulder_width": 18.0,
+                "thigh": 22.0,
+                "calf": 15.0,
+            }
+        }
+
+
+class CompleteUserMeasurements(EditableUserMeasurements):
+    date_created: PastDatetime
+    date_updated: PastDatetime
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "chest": 38.0,
+                "waist": 32.0,
+                "hips": 40.0,
+                "inseam": 30.0,
+                "neck": 15.5,
+                "sleeve_length": 34.0,
+                "shoulder_width": 18.0,
+                "thigh": 22.0,
+                "calf": 15.0,
+                "date_created": "2023-01-01T00:00:00",
+                "date_updated": "2023-01-02T00:00:00",
             }
         }
 
@@ -134,57 +234,6 @@ class UserFeedback(CompleteFeedbackInfo):
         }
 
 
-class EditablePersonalData(BaseModel):
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    phone_number: Optional[str] = None
-    email: Optional[str] = None
-    location: Optional[str] = None
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "first_name": "John",
-                "last_name": "Doe",
-                "phone_number": "+1234567890",
-                "email": "john.doe@example.com",
-                "location": "123 Main St, Anytown, USA",
-            }
-        }
-
-
-class Profile(EditablePersonalData):
-    username: str
-    date_of_birth: date
-    gender: CustomUser.UserGender
-    profile: Optional[str] = None
-    is_staff: Optional[bool] = False
-    date_joined: datetime
-
-    @field_validator("profile")
-    def validate_file(value):
-        if value:
-            return path.join(MEDIA_URL, value)
-        return value
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "first_name": "John",
-                "last_name": "Doe",
-                "phone_number": "+1234567890",
-                "email": "john.doe@example.com",
-                "location": "123 Main St, Anytown, USA",
-                "username": "johndoe",
-                "date_of_birth": "1990-01-01",
-                "gender": "male",
-                "profile": "/media/custom_user/profile.jpg",
-                "is_staff": False,
-                "date_joined": "2023-01-01T00:00:00",
-            }
-        }
-
-
 class BusinessAbout(BaseModel):
     name: str
     short_name: str
@@ -237,6 +286,15 @@ class NewVisitorMessage(BaseModel):
     email: EmailStr
     body: str
 
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "sender": "Jane Doe",
+                "email": "jane.doe@example.com",
+                "body": "I would like to inquire about your tailoring services.",
+            }
+        }
+
 
 class ServiceOffered(BaseModel):
     name: str
@@ -251,6 +309,17 @@ class ServiceOffered(BaseModel):
             return path.join(MEDIA_URL, value)
         return value
 
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "name": "Custom Suit",
+                "description": "Tailored suits made to fit your style and measurements.",
+                "picture": "/media/services/custom_suit.jpg",
+                "starting_price": 100.0,
+                "ending_price": 500.0,
+            }
+        }
+
 
 class ShallowCompletedOrderDetail(BaseModel):
     id: int
@@ -262,23 +331,100 @@ class ShallowCompletedOrderDetail(BaseModel):
             return path.join(MEDIA_URL, value)
         return value
 
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": 1,
+                "picture": "/media/orders/completed_order.jpg",
+            }
+        }
+
 
 class CompletedOrderDetail(ShallowCompletedOrderDetail):
     service_name: Service.ServiceName
     details: str
     material_type: Order.MaterialType
     fabric_required: bool
-    reference_image: str
-    charges: float
+    reference_image: Union[str, None]
+    charges: Union[float, None]
     created_at: PastDatetime
 
     @field_validator("reference_image")
     def validate_reference_image(value: str):
-        if value and not value.startswith("/"):
+        value = "/media/default/27002.jpg" if not value else value
+        if not value.startswith("/"):
             return path.join(MEDIA_URL, value)
         return value
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": 1,
+                "picture": "/media/orders/completed_order.jpg",
+                "service_name": "Custom Suit",
+                "details": "A tailored suit with premium fabric.",
+                "material_type": "Cotton",
+                "fabric_required": True,
+                "reference_image": "/media/orders/reference_image.jpg",
+                "charges": 250.0,
+                "created_at": "2023-01-01T00:00:00",
+            }
+        }
+
+
+class ShallowUserOrderDetails(BaseModel):
+    id: int
+    service_name: str
+    quantity: int
+    charges: float | None = None
+    status: Order.OrderStatus
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": 1,
+                "service_name": "Custom Suit",
+                "quantity": 2,
+                "charges": 500.0,
+                "status": "Completed",
+            }
+        }
+
+
+class UserOrderDetails(CompletedOrderDetail, ShallowUserOrderDetails):
+    urgency: Order.OrderUrgency
+    charges_paid: float
+    updated_at: PastDatetime
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": 1,
+                "service_name": "Custom Suit",
+                "quantity": 2,
+                "charges": 500.0,
+                "status": "Completed",
+                "urgency": "High",
+                "charges_paid": 500.0,
+                "picture": "/media/orders/completed_order.jpg",
+                "details": "A tailored suit with premium fabric.",
+                "material_type": "Cotton",
+                "fabric_required": True,
+                "reference_image": "/media/orders/reference_image.jpg",
+                "created_at": "2023-01-01T00:00:00",
+                "updated_at": "2023-01-02T00:00:00",
+            }
+        }
 
 
 class FAQDetails(BaseModel):
     question: str
     answer: str
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "question": "What is the turnaround time for a custom suit?",
+                "answer": "The turnaround time is typically 2-3 weeks.",
+            }
+        }

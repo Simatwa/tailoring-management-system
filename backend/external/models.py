@@ -171,7 +171,7 @@ class Message(models.Model):
     )
     body = models.TextField(verbose_name=_("Message"), help_text=_("Message body"))
     is_read = models.BooleanField(
-        verbose_name=_("Is read"), help_text=_("Message read status")
+        verbose_name=_("Is read"), help_text=_("Message read status"), default=False
     )
     created_at = models.DateTimeField(
         auto_now=True,

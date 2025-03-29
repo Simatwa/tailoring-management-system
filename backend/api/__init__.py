@@ -1,5 +1,5 @@
 """
-Pharmacy-MS API module. Uses FastAPI.
+Tailoring-MS API module. Uses FastAPI.
 """
 
 import os
@@ -28,7 +28,7 @@ api_module_path = Path(__file__).parent
 api_prefix = "/api"
 
 app = FastAPI(
-    title="Hospital-Management-System API",
+    title="Tailoring-Management-System API",
     version=api_module_path.joinpath("VERSION").read_text().strip(),
     description=api_module_path.joinpath("README.md").read_text(),
     license_info={

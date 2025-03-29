@@ -112,7 +112,10 @@ class UserMeasurements(models.Model):
         max_digits=5, decimal_places=2, help_text=_("Waist measurement in inches")
     )
     hips = models.DecimalField(
-        max_digits=5, decimal_places=2, help_text=_("Hips measurement in inches")
+        max_digits=5,
+        decimal_places=2,
+        help_text=_("Hips measurement in inches"),
+        default=None,
     )
     inseam = models.DecimalField(
         max_digits=5, decimal_places=2, help_text=_("Inseam measurement in inches")
@@ -143,3 +146,18 @@ class UserMeasurements(models.Model):
 
     def __str__(self):
         return f"Measurements for {self.user.username}"
+
+    def model_dump(self):
+        return dict(
+            chest=self.chest,
+            waist=self.waist,
+            hips=self.hips,
+            inseam=self.inseam,
+            neck=self.neck,
+            sleeve_length=self.sleeve_length,
+            shoulder_width=self.shoulder_width,
+            thigh=self.thigh,
+            calf=self.calf,
+            date_created=self.date_created,
+            date_updated=self.date_updated,
+        )
