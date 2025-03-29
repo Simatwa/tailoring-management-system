@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, User, LogOut, LogIn, UserPlus } from 'lucide-react';
+import { Menu, X, User, LogOut, LogIn, UserPlus, Settings } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import { logout, getBusinessInfo, getServicesOffered } from '../api';
 import type { BusinessAbout, ServiceOffered } from '../types';
@@ -36,6 +36,10 @@ export const Layout: React.FC = () => {
     logout();
     setUser(null);
     navigate('/');
+  };
+
+  const handleAdminPanel = () => {
+    window.location.href = '/d/admin';
   };
 
   const scrollToSection = (sectionId: string) => {
@@ -103,6 +107,15 @@ export const Layout: React.FC = () => {
                   >
                     Dashboard
                   </Link>
+                  {user?.is_staff && (
+                    <button
+                      onClick={handleAdminPanel}
+                      className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium flex items-center"
+                    >
+                      <Settings className="h-4 w-4 mr-1" />
+                      Admin Panel
+                    </button>
+                  )}
                   <button
                     onClick={handleLogout}
                     className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium flex items-center"
@@ -205,6 +218,18 @@ export const Layout: React.FC = () => {
                   >
                     Dashboard
                   </Link>
+                  {user?.is_staff && (
+                    <button
+                      onClick={() => {
+                        handleAdminPanel();
+                        setIsMenuOpen(false);
+                      }}
+                      className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 flex items-center"
+                    >
+                      <Settings className="h-4 w-4 mr-1" />
+                      Admin Panel
+                    </button>
+                  )}
                   <button
                     onClick={() => {
                       handleLogout();

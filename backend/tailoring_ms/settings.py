@@ -157,8 +157,9 @@ AUTH_USER_MODEL = "users.CustomUser"
 
 FRONTEND_DIR = (
     # None
-    BASE_DIR / "../frontend/dist.ready"
-    #Path("/home/smartwa/Projects/tms/project/dist")  #
+    BASE_DIR
+    / "../frontend/dist.ready"
+    # Path("/home/smartwa/Projects/tms/project/dist")  #
 )
 
 SITE_NAME = os.getenv("SITE_NAME", "Tailoring MS")
