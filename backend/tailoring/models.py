@@ -80,6 +80,7 @@ class Order(models.Model):
         CustomUser,
         on_delete=models.CASCADE,
         help_text=_("The client who placed the order."),
+        related_name="orders",
     )
 
     service = models.ForeignKey(
@@ -87,6 +88,7 @@ class Order(models.Model):
         on_delete=models.CASCADE,
         verbose_name=_("Service"),
         help_text=_("Order service"),
+        related_name="orders",
     )
     details = models.TextField(help_text=_("Order description"))
     material_type = models.CharField(

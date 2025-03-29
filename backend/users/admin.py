@@ -31,12 +31,28 @@ sensitive_post_parameters_m = method_decorator(sensitive_post_parameters())
 
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
+
+    def total_orders(self, obj: CustomUser) -> int:
+        return obj.orders.count()
+
+    total_orders.short_description = _("Total orders")
+
+    def in_progress_orders(self, obj: CustomUser) -> int:
+        return obj.orders.filter(status="In Progress").count()
+
     form = UserChangeForm
     add_form = AdminUserCreationForm
     change_user_password_template = None
     change_password_form = AdminPasswordChangeForm
     add_form_template = "admin/auth/user/add_form.html"
-    list_display = ["username", "email", "location", "date_joined"]
+    list_display = [
+        "username",
+        "email",
+        "location",
+        "total_orders",
+        "in_progress_orders",
+        "last_login",
+    ]
     # list_display = ("username", "email", "is_staff")
     list_filter = (
         "is_staff",
@@ -46,7 +62,7 @@ class CustomUserAdmin(admin.ModelAdmin):
         "date_joined",
     )
     search_fields = ("username", "first_name", "last_name", "email")
-    ordering = ("-date_joined",)
+    ordering = ("-last_login",)
     filter_horizontal = (
         "groups",
         "user_permissions",

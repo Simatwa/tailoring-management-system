@@ -62,7 +62,7 @@ class ServiceFeedbackAdmin(admin.ModelAdmin):
 
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
-    list_display = ("sender", "is_read", "created_at")
+    list_display = ("sender", "body", "is_read", "created_at")
     list_filter = ("is_read", "created_at")
     search_fields = ("sender", "message")
     list_editable = ("is_read",)
@@ -80,7 +80,10 @@ class MessageAdmin(admin.ModelAdmin):
         ),
         (_("Status & Date"), {"fields": ("is_read", "created_at")}),
     )
-    readonly_fields = ("created_at",)
+    readonly_fields = ("created_at", "sender", "email", "body")
+
+    def has_add_permission(self, request):
+        return False
 
 
 @admin.register(FAQ)

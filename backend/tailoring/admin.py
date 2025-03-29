@@ -7,7 +7,26 @@ from django.utils.translation import gettext_lazy as _
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ("name", "starting_price", "ending_price")
+
+    def pending_orders(self, obj: Service) -> int:
+        return obj.orders.filter(status=Order.OrderStatus.PENDING.value).count()
+
+    def completed_orders(self, obj: Service) -> int:
+        return obj.orders.filter(status=Order.OrderStatus.COMPLETED.value).count()
+
+    def in_progress_orders(self, obj: Service) -> int:
+        return obj.orders.filter(status=Order.OrderStatus.IN_PROGRESS.value).count()
+
+    pending_orders.short_description = _("Pending Orders")
+    completed_orders.short_description = _("Completed Orders")
+    in_progress_orders.short_description = _("In Progress Orders")
+    list_display = (
+        "name",
+        "pending_orders",
+        "in_progress_orders",
+        "completed_orders",
+        "starting_price",
+    )
     list_filter = ("created_at",)
     search_fields = ("name",)
     fieldsets = (
