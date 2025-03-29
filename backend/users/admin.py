@@ -40,6 +40,7 @@ class CustomUserAdmin(admin.ModelAdmin):
     def in_progress_orders(self, obj: CustomUser) -> int:
         return obj.orders.filter(status="In Progress").count()
 
+    in_progress_orders.short_description = _("In progress orders")
     form = UserChangeForm
     add_form = AdminUserCreationForm
     change_user_password_template = None
