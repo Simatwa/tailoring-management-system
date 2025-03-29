@@ -29,6 +29,7 @@ class Service(models.Model):
         verbose_name=_("Picture"),
         help_text=_("Album photo for the service"),
         default="default/tape-measure-3829506_1920.jpg",
+        upload_to=generate_document_filepath,
     )
     starting_price = models.DecimalField(
         verbose_name=_("Starting price"),
@@ -45,6 +46,9 @@ class Service(models.Model):
         default=15000,
     )
     created_at = models.DateTimeField(
+        auto_now_add=True, help_text=_("Date and time when the oder was created")
+    )
+    updated_at = models.DateTimeField(
         auto_now=True, help_text=_("Date and time when the oder was created")
     )
 
@@ -158,10 +162,10 @@ class Order(models.Model):
         help_text=_("Display this order in 'Latest work' section of the website"),
     )
     updated_at = models.DateTimeField(
-        auto_now_add=True, help_text=_("Date and time when the order was updated")
+        auto_now=True, help_text=_("Date and time when the order was updated")
     )
     created_at = models.DateTimeField(
-        auto_now=True, help_text=_("Date and time when the oder was placed")
+        auto_now_add=True, help_text=_("Date and time when the oder was placed")
     )
 
     def model_dump(self) -> dict:

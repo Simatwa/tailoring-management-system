@@ -174,7 +174,7 @@ class Message(models.Model):
         verbose_name=_("Is read"), help_text=_("Message read status"), default=False
     )
     created_at = models.DateTimeField(
-        auto_now=True,
+        auto_now_add=True,
         verbose_name=_("Created at"),
         help_text=_("Date and time when message was received."),
     )
@@ -194,7 +194,7 @@ class FAQ(models.Model):
         verbose_name="Is shown", help_text=_("Show this FAQ in website"), default=True
     )
     created_at = models.DateTimeField(
-        auto_now=True,
+        auto_now_add=True,
         verbose_name=_("Created at"),
         help_text=_("Date and time when FAQ was received."),
     )

@@ -365,7 +365,7 @@ def new_visitor_message(message: NewVisitorMessage) -> Feedback:
 def get_services_offered() -> list[ServiceOffered]:
     return [
         ServiceOffered(**jsonable_encoder(service))
-        for service in Service.objects.all().order_by("-created_at").all()[:15]
+        for service in Service.objects.all().order_by("created_at").all()[:15]
     ]
 
 
