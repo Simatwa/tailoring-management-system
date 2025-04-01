@@ -186,7 +186,7 @@ SITE_NAME = os.getenv("SITE_NAME", "Tailoring MS")
 
 UNFOLD = {
     "SITE_TITLE": SITE_NAME,
-    "SITE_HEADER": f"{SITE_NAME} ADMIN",
+    "SITE_HEADER": f"{SITE_NAME}",
     "SITE_SUBHEADER": "TMS",
     "SITE_DROPDOWN": [
         {
