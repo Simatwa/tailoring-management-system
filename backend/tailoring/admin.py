@@ -1,12 +1,23 @@
 from django.contrib import admin
 from tailoring.models import Service, Order
 from django.utils.translation import gettext_lazy as _
+from unfold.admin import ModelAdmin
+from import_export.admin import ImportExportModelAdmin
+from unfold.contrib.import_export.forms import (
+    ExportForm,
+    ImportForm,
+    SelectableFieldsExportForm,
+)
+
 
 # Register your models here.
 
 
 @admin.register(Service)
-class ServiceAdmin(admin.ModelAdmin):
+class ServiceAdmin(ModelAdmin, ImportExportModelAdmin):
+
+    import_form_class = ImportForm
+    export_form_class = SelectableFieldsExportForm
 
     def pending_orders(self, obj: Service) -> int:
         return obj.orders.filter(status=Order.OrderStatus.PENDING.value).count()
@@ -36,18 +47,25 @@ class ServiceAdmin(admin.ModelAdmin):
                 "fields": (
                     "name",
                     "description",
-                )
+                ),
+                "classes": ["tab"],
             },
         ),
-        (_("Prices"), {"fields": ("starting_price", "ending_price")}),
-        (_("Media & Date"), {"fields": ("picture", "created_at")}),
+        (
+            _("Prices"),
+            {"fields": ("starting_price", "ending_price"), "classes": ["tab"]},
+        ),
+        (_("Media & Date"), {"fields": ("picture", "created_at"), "classes": ["tab"]}),
     )
     readonly_fields = ("created_at",)
     ordering = ("-created_at",)
 
 
 @admin.register(Order)
-class OrderAdmin(admin.ModelAdmin):
+class OrderAdmin(ModelAdmin, ImportExportModelAdmin):
+    import_form_class = ImportForm
+    export_form_class = SelectableFieldsExportForm
+
     list_display = (
         "client",
         "service",
@@ -78,15 +96,28 @@ class OrderAdmin(admin.ModelAdmin):
                     "fabric_required",
                     "quantity",
                     "urgency",
-                )
+                ),
+                "classes": ["tab"],
             },
         ),
-        (_("Preferences"), {"fields": ("reference_image", "colors")}),
-        (_("Cost Information"), {"fields": ("charges", "charges_paid")}),
-        (_("Status and Picture"), {"fields": ("status", "picture")}),
+        (
+            _("Preferences"),
+            {"fields": ("reference_image", "colors"), "classes": ["tab"]},
+        ),
+        (
+            _("Cost Information"),
+            {"fields": ("charges", "charges_paid"), "classes": ["tab"]},
+        ),
+        (
+            _("Status and Picture"),
+            {"fields": ("status", "picture"), "classes": ["tab"]},
+        ),
         (
             _("Publicity & Date"),
-            {"fields": ("show_in_index", "created_at", "updated_at")},
+            {
+                "fields": ("show_in_index", "created_at", "updated_at"),
+                "classes": ["tab"],
+            },
         ),
     )
 

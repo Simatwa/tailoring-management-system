@@ -8,11 +8,6 @@ from django.contrib import admin, messages
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.admin.utils import unquote
 from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.forms import (
-    AdminPasswordChangeForm,
-    AdminUserCreationForm,
-    UserChangeForm,
-)
 from django.core.exceptions import PermissionDenied
 from django.db import router, transaction
 from django.http import Http404, HttpResponseRedirect
@@ -28,9 +23,17 @@ from django.views.decorators.debug import sensitive_post_parameters
 csrf_protect_m = method_decorator(csrf_protect)
 sensitive_post_parameters_m = method_decorator(sensitive_post_parameters())
 
+from unfold.admin import ModelAdmin
+
+from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
+from django.contrib.auth.models import Group
+
+from unfold.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationForm
+from unfold.admin import ModelAdmin
+
 
 @admin.register(CustomUser)
-class CustomUserAdmin(admin.ModelAdmin):
+class CustomUserAdmin(ModelAdmin):
 
     def total_orders(self, obj: CustomUser) -> int:
         return obj.orders.count()
@@ -42,9 +45,10 @@ class CustomUserAdmin(admin.ModelAdmin):
 
     in_progress_orders.short_description = _("In progress orders")
     form = UserChangeForm
-    add_form = AdminUserCreationForm
-    change_user_password_template = None
+    add_form = UserCreationForm
     change_password_form = AdminPasswordChangeForm
+
+    change_user_password_template = None
     add_form_template = "admin/auth/user/add_form.html"
     list_display = [
         "username",
@@ -282,8 +286,16 @@ class CustomUserAdmin(admin.ModelAdmin):
         return super().response_add(request, obj, post_url_continue)
 
 
+admin.site.unregister(Group)
+
+
+@admin.register(Group)
+class GroupAdmin(BaseGroupAdmin, ModelAdmin):
+    pass
+
+
 @admin.register(UserMeasurements)
-class UserMeasurementsAdmin(admin.ModelAdmin):
+class UserMeasurementsAdmin(ModelAdmin):
     list_display = ["user", "chest", "waist", "hips", "inseam", "neck"]
     list_filter = ["user__username", "date_created", "date_updated"]
     search_fields = ["user__username", "user__email"]

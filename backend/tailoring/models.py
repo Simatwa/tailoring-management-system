@@ -46,10 +46,10 @@ class Service(models.Model):
         default=15000,
     )
     created_at = models.DateTimeField(
-        auto_now_add=True, help_text=_("Date and time when the oder was created")
+        auto_now_add=True, help_text=_("Date and time when the service was created")
     )
     updated_at = models.DateTimeField(
-        auto_now=True, help_text=_("Date and time when the oder was created")
+        auto_now=True, help_text=_("Date and time when the service was created")
     )
 
     class Meta:

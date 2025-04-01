@@ -1,12 +1,13 @@
 from django.contrib import admin
 from external.models import About, ServiceFeedback, Message, FAQ
 from django.utils.translation import gettext_lazy as _
+from unfold.admin import ModelAdmin
 
 # Register your models here.
 
 
 @admin.register(About)
-class AboutAdmin(admin.ModelAdmin):
+class AboutAdmin(ModelAdmin):
     list_display = ("name", "short_name", "founded_in", "updated_at")
     fieldsets = (
         (None, {"fields": ("name", "short_name", "slogan", "details", "address")}),
@@ -46,7 +47,7 @@ class AboutAdmin(admin.ModelAdmin):
 
 
 @admin.register(ServiceFeedback)
-class ServiceFeedbackAdmin(admin.ModelAdmin):
+class ServiceFeedbackAdmin(ModelAdmin):
     list_display = ("sender", "rate", "show_in_index", "sender_role", "created_at")
     search_fields = ("sender__username", "message")
     list_filter = ("rate", "show_in_index", "updated_at", "created_at")
@@ -54,14 +55,14 @@ class ServiceFeedbackAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
     fieldsets = (
         (None, {"fields": ("sender", "message")}),
-        (_("Details"), {"fields": ("sender_role", "rate")}),
-        (_("Timestamps"), {"fields": ("updated_at", "created_at")}),
+        (_("Details"), {"fields": ("sender_role", "rate"), "classes": ["tab"]}),
+        (_("Timestamps"), {"fields": ("updated_at", "created_at"), "classes": ["tab"]}),
     )
     readonly_fields = ("updated_at", "created_at")
 
 
 @admin.register(Message)
-class MessageAdmin(admin.ModelAdmin):
+class MessageAdmin(ModelAdmin):
     list_display = ("sender", "body", "is_read", "created_at")
     list_filter = ("is_read", "created_at")
     search_fields = ("sender", "message")
@@ -87,7 +88,7 @@ class MessageAdmin(admin.ModelAdmin):
 
 
 @admin.register(FAQ)
-class FAQAdmin(admin.ModelAdmin):
+class FAQAdmin(ModelAdmin):
     list_display = ("question", "is_shown", "created_at")
     list_filter = ("is_shown", "created_at")
     search_fields = ("question", "answer")

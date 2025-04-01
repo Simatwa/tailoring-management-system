@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 import dotenv
+from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
+from django.templatetags.static import static
 
 dotenv.load_dotenv()
 
@@ -38,7 +41,15 @@ ALLOWED_HOSTS = [host.strip() for host in os.getenv("ALLOWED_HOSTS", "*").split(
 # Application definition
 
 INSTALLED_APPS = [
-    "jazzmin",
+    # "jazzmin",
+    "unfold",  # before django.contrib.admin
+    "unfold.contrib.filters",  # optional, if special filters are needed
+    "unfold.contrib.forms",  # optional, if special form elements are needed
+    "unfold.contrib.inlines",  # optional, if special inlines are needed
+    "unfold.contrib.import_export",  # optional, if django-import-export package is used
+    # "unfold.contrib.guardian",  # optional, if django-guardian package is used
+    # "unfold.contrib.simple_history",  # optional, if django-simple-history package is used
+    "import_export",
     "users.apps.UsersConfig",
     "tailoring.apps.TailoringConfig",
     "external.apps.ExternalConfig",
@@ -58,6 +69,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
 ]
 
 ROOT_URLCONF = "tailoring_ms.urls"
@@ -135,6 +147,14 @@ USE_I18N = True
 USE_TZ = True
 
 
+LANGUAGES = (
+    ("de", _("German")),
+    ("en", _("English")),
+    ("fr", _("French")),
+    ("sw", _("Swahili")),
+)
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
@@ -164,77 +184,195 @@ FRONTEND_DIR = (
 
 SITE_NAME = os.getenv("SITE_NAME", "Tailoring MS")
 
-JAZZMIN_SETTINGS = {
-    "show_ui_builder": True,
-    "site_title": SITE_NAME,
-    "site_header": SITE_NAME,
-    "site_brand": SITE_NAME,
-    "site_logo": "tailoring/img/logo.png",
-    "site_logo_classes": "img-circle",
-    "welcome_sign": f"Welcome to {SITE_NAME}",
-    "copyright": SITE_NAME,
-    "user_avatar": "profile",
-    "topmenu_links": [
-        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
+UNFOLD = {
+    "SITE_TITLE": SITE_NAME,
+    "SITE_HEADER": f"{SITE_NAME} ADMIN",
+    "SITE_SUBHEADER": "TMS",
+    "SITE_DROPDOWN": [
         {
-            "name": "Support",
-            "url": "https://github.com/Simatwa/tailoring-management-system/issues",
-            "new_window": True,
+            "icon": "support_agent",
+            "title": _("Support"),
+            "link": "https://github.com/Simatwa/tailoring-management-system",
         },
         {
-            "name": "Index",
-            "url": "/",
-            "new_window": True,
+            "icon": "language",
+            "title": _("Index"),
+            "link": "/",
         },
-        {"model": "tailoring.Order"},
-        {"app": "tailoring"},
+        # ...
     ],
-    "search_model": ["tailoring.Order"],
-    "language_chooser": True,
-    "icons": {
-        "auth": "fas fa-users-cog",
-        "auth.Group": "fas fa-users",
-        "users.CustomUser": "fas fa-user",
-        "users.UserMeasurements": "fas fa-ruler",
-        "external.ServiceFeedback": "fas fa-comments",
-        "external.Gallery": "fas fa-images",
-        "external.About": "fas fa-info-circle",
-        "external.FAQ": "fas fa-question-circle",
-        "external.Message": "fas fa-envelope",
-        "tailoring.Order": "fas fa-shopping-cart",
-        "tailoring.Service": "fas fa-concierge-bell",
+    "SITE_URL": "/",
+    "SITE_ICON--": lambda request: static(
+        "tailoring/img/logo.png"
+    ),  # both modes, optimise for 32px height
+    "SITE_LOGO--": lambda request: static(
+        "tailoring/img/logo.png"
+    ),  # both modes, optimise for 32px height
+    "SITE_SYMBOL": "content_cut",  # symbol from icon set
+    "SITE_FAVICONS": [
+        {
+            "rel": "icon",
+            "sizes": "64x64",
+            "type": "image/png",
+            "href": lambda request: static("tailoring/img/logo.png"),
+        },
+    ],
+    "SHOW_COUNTS": True,
+    "SHOW_HISTORY": True,  # show/hide "History" button, default: True
+    "SHOW_VIEW_ON_SITE": True,  # show/hide "View on site" button, default: True
+    "SHOW_BACK_BUTTON": True,  # show/hide "Back" button on changeform in header, default: False
+    "SHOW_LANGUAGES": True,
+    # "ENVIRONMENT": "sample_app.environment_callback", # environment name in header
+    # "ENVIRONMENT_TITLE_PREFIX": "sample_app.environment_title_prefix_callback", # environment name prefix in title tag
+    # "DASHBOARD_CALLBACK": "sample_app.dashboard_callback",
+    # "THEME": "dark", # Force theme: "dark" or "light". Will disable theme switcher
+    "LOGIN": {
+        "image": lambda request: "/media/default/threads-5547529_1920.jpg",
+        # "redirect_after": lambda request: reverse_lazy("admin:APP_MODEL_changelist"),
     },
-}
-
-JAZZMIN_UI_TWEAKS1 = {
-    "navbar_small_text": False,
-    "footer_small_text": False,
-    "body_small_text": False,
-    "brand_small_text": False,
-    "brand_colour": "navbar-primary",
-    "accent": "accent-primary",
-    "navbar": "navbar-primary navbar-dark",
-    "no_navbar_border": False,
-    "navbar_fixed": True,
-    "layout_boxed": False,
-    "footer_fixed": False,
-    "sidebar_fixed": True,
-    "sidebar": "sidebar-dark-teal",
-    "sidebar_nav_small_text": False,
-    "sidebar_disable_expand": False,
-    "sidebar_nav_child_indent": False,
-    "sidebar_nav_compact_style": False,
-    "sidebar_nav_legacy_style": False,
-    "sidebar_nav_flat_style": False,
-    "theme": "default",
-    "dark_mode_theme": None,
-    "button_classes": {
-        "primary": "btn-primary",
-        "secondary": "btn-secondary",
-        "info": "btn-outline-info",
-        "warning": "btn-outline-warning",
-        "danger": "btn-outline-danger",
-        "success": "btn-outline-success",
+    "STYLES": [
+        # lambda request: static("css/style.css"),
+    ],
+    "SCRIPTS": [
+        # lambda request: static("js/script.js"),
+    ],
+    "BORDER_RADIUS": "6px",
+    "COLORS": {
+        "base": {
+            "50": "249 250 251",
+            "100": "243 244 246",
+            "200": "229 231 235",
+            "300": "209 213 219",
+            "400": "156 163 175",
+            "500": "107 114 128",
+            "600": "75 85 99",
+            "700": "55 65 81",
+            "800": "31 41 55",
+            "900": "17 24 39",
+            "950": "3 7 18",
+        },
+        "primary": {
+            "50": "250 245 255",
+            "100": "243 232 255",
+            "200": "233 213 255",
+            "300": "216 180 254",
+            "400": "192 132 252",
+            "500": "168 85 247",
+            "600": "147 51 234",
+            "700": "126 34 206",
+            "800": "107 33 168",
+            "900": "88 28 135",
+            "950": "59 7 100",
+        },
+        "font": {
+            "subtle-light": "var(--color-base-500)",  # text-base-500
+            "subtle-dark": "var(--color-base-400)",  # text-base-400
+            "default-light": "var(--color-base-600)",  # text-base-600
+            "default-dark": "var(--color-base-300)",  # text-base-300
+            "important-light": "var(--color-base-900)",  # text-base-900
+            "important-dark": "var(--color-base-100)",  # text-base-100
+        },
     },
-    "actions_sticky_top": False,
+    "EXTENSIONS": {
+        "modeltranslation": {
+            "flags": {
+                "en": "🇬🇧",
+                "fr": "🇫🇷",
+                "de": "🇧🇪",
+                "sw": "🇰🇪",
+            },
+        },
+    },
+    "SIDEBAR": {
+        "show_search": True,  # Search in applications and models names
+        "show_all_applications": True,  # Dropdown with all applications and models
+        "navigation": [
+            {
+                "title": _("Navigation"),
+                "separator": True,  # Top border
+                "collapsible": False,  # Collapsible group of links
+                "items": [
+                    {
+                        "title": _("Dashboard"),
+                        "icon": "dashboard",  # Supported icon set: https://fonts.google.com/icons
+                        "link": reverse_lazy("admin:index"),
+                        # "badge": "sample_app.badge_callback",
+                        "permission": lambda request: request.user.is_staff,
+                    },
+                ],
+            },
+            {
+                "title": _("Users & Groups"),
+                "separator": True,  # Top border
+                "collapsible": True,  # Collapsible group of links
+                "items": [
+                    {
+                        "title": _("Users"),
+                        "icon": "manage_accounts",  # Supported icon set: https://fonts.google.com/icons
+                        "link": reverse_lazy("admin:users_customuser_changelist"),
+                        "permission": lambda request: request.user.is_staff,
+                    },
+                    {
+                        "title": _("Groups"),
+                        "icon": "group",
+                        "link": reverse_lazy("admin:auth_group_changelist"),
+                        "permission": lambda request: request.user.is_staff,
+                    },
+                ],
+            },
+            {
+                "title": _("Tailoring"),
+                "separator": True,
+                "collapsible": False,
+                "items": [
+                    {
+                        "title": _("Services"),
+                        "icon": "linked_services",
+                        "link": reverse_lazy("admin:tailoring_service_changelist"),
+                        "permission": lambda request: request.user.is_staff,
+                    },
+                    {
+                        "title": _("Orders"),
+                        "icon": "orders",
+                        "link": reverse_lazy("admin:tailoring_order_changelist"),
+                        "permission": lambda request: request.user.is_staff,
+                    },
+                ],
+            },
+            {
+                "title": _("External"),
+                "separator": True,
+                "collapsible": False,
+                "items": [
+                    {
+                        "title": _("Abouts"),
+                        "icon": "info",
+                        "link": reverse_lazy("admin:external_about_changelist"),
+                        "permission": lambda request: request.user.is_staff,
+                    },
+                    {
+                        "title": _("Feedbacks"),
+                        "icon": "chat",
+                        "link": reverse_lazy(
+                            "admin:external_servicefeedback_changelist"
+                        ),
+                        "permission": lambda request: request.user.is_staff,
+                    },
+                    {
+                        "title": _("Messages"),
+                        "icon": "mark_email_unread",
+                        "link": reverse_lazy("admin:external_message_changelist"),
+                        "permission": lambda request: request.user.is_staff,
+                    },
+                    {
+                        "title": _("FAQs"),
+                        "icon": "live_help",
+                        "link": reverse_lazy("admin:external_faq_changelist"),
+                        "permission": lambda request: request.user.is_staff,
+                    },
+                ],
+            },
+        ],
+    },
+    "TABS": [],
 }
