@@ -44,7 +44,7 @@ A complete digital solution for tailoring businesses – manage services, receiv
 
 ## ⚙️ Installation
 
-> **Note**  
+>[!NOTE]
 > Make sure you have [Python ≥ 3.13](https://www.python.org/) and [Git](https://git-scm.com/) installed.
 
 ```bash
@@ -86,6 +86,7 @@ python -m fastapi run api
 | **API Docs (Swagger)** | `/api/docs` |
 | **API Docs (ReDoc)** | `/api/redoc` |
 
+> [!IMPORTANT]
 > **Admin Credentials**  
 > Username: `developer`  
 > Password: `development`
