@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     # "unfold.contrib.guardian",  # optional, if django-guardian package is used
     # "unfold.contrib.simple_history",  # optional, if django-simple-history package is used
     "import_export",
+    "corsheaders",
     "users.apps.UsersConfig",
     "tailoring.apps.TailoringConfig",
     "external.apps.ExternalConfig",
@@ -64,6 +65,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     # "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -154,6 +156,9 @@ LANGUAGES = (
     ("sw", _("Swahili")),
 )
 
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^http://localhost.*",
+]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
