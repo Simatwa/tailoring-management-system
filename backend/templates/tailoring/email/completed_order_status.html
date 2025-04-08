@@ -1,0 +1,95 @@
+{% load my_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Completed</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 20px;
+            color: #333;
+            line-height: 1.6;
+        }
+        .content h2 {
+            color: #4CAF50;
+            font-size: 20px;
+        }
+        .content p {
+            margin: 10px 0;
+        }
+        .footer {
+            background-color: #f1f1f1;
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+            color: #777;
+        }
+        .button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>Order Completed</h1>
+        </div>
+        <div class="content">
+            <h2>Dear {{ order.client.username }},</h2>
+            <p>We are delighted to inform you that your tailoring order has been successfully completed!</p>
+            <p>Order Details:</p>
+            <ul>
+                <li><strong>Order ID:</strong> {{ order.id }}</li>
+                <li><strong>Order Service:</strong> {{ order.service.name }}</li>
+                <li><strong>Order Quantity:</strong> {{ order.quantity }}</li>
+                <li><strong>Date Created:</strong> {{ order.created_at|date:"F d, Y" }}</li>
+                <li><strong>Charges:</strong> Ksh. {{ order.charges|format_money_value }}</li>
+                <li><strong>Charges Paid:</strong> Ksh. {{ order.charge_paid|format_money_value }}</li>
+                <li><strong>Completion Date:</strong> {{ date|date:"F d, Y" }}</li>
+            </ul>
+            <p>Your order is now ready for pickup or delivery as per your chosen preference.</p>
+            <p>If you have any questions or need further assistance, feel free to contact us.</p>
+            <a href="{{ dashboard|endpoint_url }}" class="button">View Order Details</a>
+        </div>
+        <div class="footer">
+            <p>Thank you for choosing our tailoring services!</p>
+            <p>&copy; {{ year }} {{ site_name }}. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

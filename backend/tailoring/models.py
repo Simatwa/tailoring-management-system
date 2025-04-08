@@ -2,6 +2,10 @@ from django.db import models
 from users.models import CustomUser
 from tailoring_ms.utils import EnumWithChoices, generate_document_filepath
 from django.utils.translation import gettext_lazy as _
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.conf import settings
+from django.utils import timezone
 
 # Create your models here.
 
@@ -161,6 +165,18 @@ class Order(models.Model):
         default=True,
         help_text=_("Display this order in 'Latest work' section of the website"),
     )
+    user_is_notified_in_progress = models.BooleanField(
+        default=False,
+        help_text=_("Flag to track mailing user about a in_progress order status"),
+    )
+    user_is_notified_completed = models.BooleanField(
+        default=False,
+        help_text=_("Flag to track mailing user about a completed order status"),
+    )
+    user_is_notified_cancelled = models.BooleanField(
+        default=False,
+        help_text=_("Flag to track mailing user about a cancelled order status"),
+    )
     updated_at = models.DateTimeField(
         auto_now=True, help_text=_("Date and time when the order was updated")
     )
@@ -199,3 +215,48 @@ class Order(models.Model):
         if self.reference_image is not None:
             self.reference_image.delete(save=False)
         super().delete(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        def send_email(subject, template_name):
+            email_body = render_to_string(
+                f"tailoring/email/{template_name}_order_status.html",
+                {
+                    "order": self,
+                    "site_name": settings.SITE_NAME,
+                    "year": timezone.now().year,
+                    "date": timezone.now().date(),
+                },
+            )
+
+            # Send the email
+            send_mail(
+                subject=subject,
+                message="",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[self.client.email],
+                fail_silently=(settings.DEBUG == False),  # Silent in production
+                html_message=email_body,
+            )
+
+        if (
+            self.status == self.OrderStatus.IN_PROGRESS.value
+            and self.user_is_notified_in_progress == False
+        ):
+            send_email("Order In Progress", "in_progress")
+            self.user_is_notified_in_progress = True
+        elif (
+            self.status == self.OrderStatus.COMPLETED.value
+            and self.user_is_notified_completed == False
+        ):
+            # Render the email content
+            send_email("Your Order is Completed", "completed")
+            self.user_is_notified_completed = True
+        elif (
+            self.status == self.OrderStatus.CANCELLED.value
+            and self.user_is_notified_cancelled == False
+        ):
+            # Render the email content
+            send_email("Your Order is Cancelled", "cancelled")
+            self.user_is_notified_cancelled = True
+
+        super().save(*args, **kwargs)
