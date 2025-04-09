@@ -7,7 +7,9 @@ from django.core.validators import FileExtensionValidator
 from enum import Enum
 from datetime import datetime
 from django.core.validators import RegexValidator
-from datetime import date
+from datetime import date, timedelta
+from django.utils import timezone
+from tailoring_ms.utils import get_expiry_datetime
 
 # Create your models here.
 
@@ -96,6 +98,20 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
+
+
+class AuthToken(models.Model):
+
+    user = models.OneToOneField(
+        CustomUser, on_delete=models.CASCADE, related_name="auth_token"
+    )
+    token = models.CharField(help_text=_("auth token value"), max_length=80, null=False)
+    expiry_datetime = models.DateTimeField(
+        help_text=_("Expiry datetime"), null=False, default=get_expiry_datetime
+    )
+
+    def is_expired(self):
+        return timezone.now() > self.expiry_datetime
 
 
 class UserMeasurements(models.Model):

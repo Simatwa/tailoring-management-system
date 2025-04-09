@@ -6,6 +6,7 @@ from users.models import CustomUser
 from external.models import ServiceFeedback
 from tailoring.models import Service, Order
 from os import path
+import re
 
 
 class TokenAuth(BaseModel):
@@ -22,6 +23,38 @@ class TokenAuth(BaseModel):
             "example": {
                 "access_token": "tms_27b9d79erc245r44b9rba2crd2273b5cbb71",
                 "token_type": "bearer",
+            }
+        }
+
+
+class ResetPassword(BaseModel):
+    username: str
+    new_password: str
+    token: str
+
+    @field_validator("new_password")
+    def validate_new_password(new_password):
+        if not re.match(
+            r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&_-])[A-Za-z\d@$!%*?&_-]{8,}$",
+            new_password,
+        ):
+            raise ValueError(
+                "Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character."
+            )
+        return new_password
+
+    @field_validator("token")
+    def validate_token(token):
+        if not re.match(r"[A-Z\d]{6,}", token):
+            raise ValueError("Invalid token")
+        return token
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "username": "Smartwa",
+                "new_password": "_Cljsuw376j$",
+                "token": "0IJ4826L",
             }
         }
 

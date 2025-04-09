@@ -11,14 +11,22 @@ from fastapi import (
 )
 from fastapi.encoders import jsonable_encoder
 from fastapi.security.oauth2 import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from users.models import CustomUser, UserMeasurements
+from users.models import CustomUser, UserMeasurements, AuthToken
 from external.models import About, Message, FAQ, ServiceFeedback
 from tailoring.models import Service, Order
+from tailoring_ms.utils import get_expiry_datetime
 
 # from django.contrib.auth.hashers import check_password
-from api.v1.utils import token_id, generate_token, get_value
+from api.v1.utils import (
+    token_id,
+    generate_token,
+    get_value,
+    generate_password_reset_token,
+    send_email,
+)
 from api.v1.models import (
     TokenAuth,
+    ResetPassword,
     Profile,
     EditablePersonalData,
     Feedback,
@@ -38,6 +46,7 @@ from api.v1.models import (
 import asyncio
 from typing import Annotated, Union, Optional
 from pydantic import PositiveInt
+from django.db.models import Q
 
 router = APIRouter(prefix="/v1", tags=["v1"])
 
@@ -105,6 +114,72 @@ def generate_new_token(user: Annotated[CustomUser, Depends(get_user)]) -> TokenA
     user.token = generate_token()
     user.save()
     return TokenAuth(access_token=user.token)
+
+
+@router.get("/password/send-reset-token", name="Send password reset password")
+def reset_password(
+    identity: Annotated[str, Query(description="Username or email address")]
+) -> Feedback:
+    """Emails password reset token to user"""
+    try:
+        target_user = CustomUser.objects.filter(
+            Q(username=identity) | Q(email=identity)
+        ).get()
+        auth_token = AuthToken.objects.filter(user=target_user).first()
+        if auth_token:
+            auth_token.token = generate_password_reset_token()
+            auth_token.expiry_datetime = get_expiry_datetime()
+        else:
+            auth_token = AuthToken.objects.create(
+                user=target_user,
+                token=generate_password_reset_token(),
+            )
+        auth_token.save()
+        send_email(
+            subject="Password Reset Token",
+            recipient=auth_token.user.email,
+            template_name="email/password_reset_token",
+            context=dict(auth_token=auth_token),
+        )
+
+    except CustomUser.DoesNotExist:
+        # Let's not diclose about this for security reasons
+        pass
+    finally:
+        return Feedback(
+            detail=(
+                "If an account with the provided identity exists, "
+                "a password reset token has been sent to the associated email address."
+            )
+        )
+
+
+@router.post("/password/reset", name="Set new password")
+def reset_password(info: ResetPassword) -> Feedback:
+    """Resets user password"""
+    try:
+        auth_token = AuthToken.objects.get(token=info.token)
+        if auth_token.is_expired():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Token has expired.",
+            )
+        user = auth_token.user
+        if user.username == info.username:
+            user.set_password(info.new_password)
+            user.save()
+            auth_token.delete()
+            return Feedback(detail="Password reset successfully.")
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid username"
+            )
+
+    except AuthToken.DoesNotExist:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid token.",
+        )
 
 
 @router.get("/profile", name="Profile information")
