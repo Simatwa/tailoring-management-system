@@ -29,8 +29,8 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({ service, onClose }) 
             </button>
           </div>
 
-          <div className="sm:flex sm:items-start">
-            <div className="mt-3 text-center sm:mt-0 sm:text-left w-full">
+          <div>
+            <div className="mt-3 sm:mt-0 text-left w-full">
               <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
                 {service.name}
               </h3>

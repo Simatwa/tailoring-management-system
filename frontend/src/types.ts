@@ -106,6 +106,12 @@ export interface RegisterFormData {
   password: string;
 }
 
+export interface PasswordResetData {
+  username: string;
+  new_password: string;
+  token: string;
+}
+
 export interface ShallowUserOrderDetails {
   id: number;
   service_name: string;

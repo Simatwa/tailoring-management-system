@@ -126,7 +126,7 @@ def reset_password(
             Q(username=identity) | Q(email=identity)
         ).get()
         auth_token = AuthToken.objects.filter(user=target_user).first()
-        if auth_token:
+        if auth_token is not None:
             auth_token.token = generate_password_reset_token()
             auth_token.expiry_datetime = get_expiry_datetime()
         else:
@@ -145,6 +145,8 @@ def reset_password(
     except CustomUser.DoesNotExist:
         # Let's not diclose about this for security reasons
         pass
+    except Exception as e:
+        print(e)
     finally:
         return Feedback(
             detail=(
@@ -433,6 +435,12 @@ def get_hospital_details() -> BusinessAbout:
 def new_visitor_message(message: NewVisitorMessage) -> Feedback:
     new_message = Message.objects.create(**message.model_dump())
     new_message.save()
+    send_email(
+        "Message Received Confirmation",
+        recipient=new_message.email,
+        template_name="email/message_received_confirmation",
+        context=dict(message=new_message),
+    )
     return Feedback(detail="Message received succesfully.")
 
 

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AuthResponse, RegisterFormData, UserProfile, UserMeasurements, ShallowUserOrderDetails, UserOrderDetails, NewOrderData } from './types';
+import type { AuthResponse, RegisterFormData, UserProfile, UserMeasurements, ShallowUserOrderDetails, UserOrderDetails, NewOrderData, PasswordResetData } from './types';
 
 const api = axios.create({
   baseURL: '/api/v1',
@@ -88,6 +88,16 @@ export const register = async (data: RegisterFormData) => {
 
 export const checkUsername = async (username: string) => {
   const response = await api.get(`/user/exists?username=${username}`);
+  return response.data;
+};
+
+export const requestPasswordResetToken = async (username: string) => {
+  const response = await api.get(`/password/send-reset-token?identity=${username}`);
+  return response.data;
+};
+
+export const resetPassword = async (data: PasswordResetData) => {
+  const response = await api.post('/password/reset', data);
   return response.data;
 };
 

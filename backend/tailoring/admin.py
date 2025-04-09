@@ -74,8 +74,9 @@ class OrderAdmin(ModelAdmin, ImportExportModelAdmin):
         "charges",
         "charges_paid",
         "status",
-        "fabric_required",
+        "show_in_index",
     )
+    list_editable = ("show_in_index", "status")
     search_fields = ("client__username",)
     list_filter = (
         "client__username",
